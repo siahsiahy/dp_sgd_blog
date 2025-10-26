@@ -80,7 +80,7 @@ Just like how attention helps models focus on **important regions** in an image,
 differential privacy helps models **forget unnecessary details** about individual samples.  
 Take the two brains in Fig. 1 as an example.
 
-![DP-SGD Brain]({{ site.baseurl }}/assets/img/dpsgd_brain.png)
+![DP-SGD Brain]({{ site.baseurl }}/assets/img/dpsgd_brain.png){: width="400" }
 
 **Figure 1:** A visual comparison between **SGD** and **DP-SGD**.  
 The brain on the left (SGD) memorizes every tiny detail — faces, words, and data points — 
@@ -196,7 +196,7 @@ Parameters: learning rate \(\eta_t\), noise scale \(\sigma\), group size \(L\), 
 **Initialize** $\theta_0$ randomly  
 
 **for** $t \in [T]$ **do**  
-&nbsp;&nbsp;&nbsp;&nbsp;Take a random sample $\(L_t$ with sampling probability $L/N$  
+&nbsp;&nbsp;&nbsp;&nbsp;Take a random sample $L_t$ with sampling probability $L/N$  
 &nbsp;&nbsp;&nbsp;&nbsp;**Compute gradient:**  
 $$
 g_t(x_i) \leftarrow \nabla_\theta \mathcal{L}(\theta_t, x_i)
@@ -432,7 +432,7 @@ When using the same training settings $(q = 0.01, σ = 4, δ = 10⁻⁵)$
 we can compare the two accounting methods directly.
 
 <figure>
-  <img src="/assets/img/moments_vs_composition.png" alt="Privacy accountant vs strong composition" width="480">
+  <img src="{{ site.baseurl }}/assets/img/moments_vs_composition.png" alt="Privacy accountant vs strong composition" width="480">
   <figcaption><strong>Figure 2.</strong> The ε-value as a function of training epochs, comparing the strong composition theorem and the moments accountant. The latter achieves much tighter bounds.</figcaption>
 </figure>
 
@@ -455,7 +455,7 @@ We train a model to classify these digits, and then see how well it performs und
 We trained models on MNIST using different noise levels while keeping other hyperparameters fixed. Below are training and testing accuracy plots for three noise scales:
 
 <figure>
-  <img src="/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="480">
+  <img src="{{ site.baseurl }}/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="480">
   <figcaption><strong>Figure 3.</strong> Accuracy over epochs for different noise levels on MNIST (Large, Medium, Small). Each model uses 60D PCA, 1000 hidden units, and clip threshold 4.</figcaption>
 </figure>
 
@@ -472,7 +472,7 @@ Key takeaways:
 To analyze how privacy parameters directly affect accuracy, we varied ε (epsilon) while fixing δ (delta). Each line in the plot below represents a different (ε, δ) pair:
 
 <figure>
-  <img src="/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
+  <img src="{{ site.baseurl }}/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
   <figcaption><strong>Figure 4.</strong> Accuracy vs epsilon on MNIST for various delta values.</figcaption>
 </figure>
 
@@ -489,7 +489,7 @@ What’s happening here:
 To see how robust the model is, we varied each parameter individually — like projection dimension, hidden units, lot size, etc. This gives a sense of which knobs matter most.
 
 <figure>
-  <img src="/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="480">
+  <img src="{{ site.baseurl }}/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="480">
   <figcaption><strong>Figure 5.</strong> MNIST accuracy when one parameter varies and others stay at reference values.</figcaption>
 </figure>
 
@@ -508,7 +508,7 @@ To see how robust the model is, we varied each parameter individually — like p
 MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level ($ε$ = 2, 4, 8). Here's what we get:
 
 <figure>
-  <img src="/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
+  <img src="{{ site.baseurl }}/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
   <figcaption><strong>Figure 6.</strong> CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000.</figcaption>
 </figure>
 
