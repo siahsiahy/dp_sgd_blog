@@ -45,8 +45,8 @@ toc:
     #   - name: Example Child Subsection 2
   - name: Why Whisper?
   - name: What Does DP-SGD Actually Do?
-  - name: Anatomy of a Noisy Gradient
-  - name: Privacy vs. Accuracy — the Eternal Trade-off
+  - name: Algorithm: Making SGD Private
+  - name: Implementing DP-SGD: Where Theory Meets TensorFlow
   - name: When Math Meets Reality
   - name: Lessons from Experiments
   - name: Beyond the Noise
@@ -105,7 +105,7 @@ Modern deep learning thrives on **data — lots of it.**
 The more data a model sees, the smarter it becomes.  
 But there’s a catch: much of that data is **personal** — medical records, voice recordings, photos, chat logs.  
 
-> “The more a model learns, the more it remembers — sometimes too much.”
+> “The more a model learns, the more it remembers.”
 
 Imagine training a speech recognition system.  
 It might not only learn to recognize words,  
@@ -141,200 +141,360 @@ you can build smart models and keep people’s data safe at the same time.
 ## What Does DP-SGD Actually Do?
 
 In deep learning, we usually train models with **stochastic gradient descent (SGD)**, letting them adjust their weights based on every tiny detail in the data.  
-That’s great for accuracy, but the model can end up *remembering* things it shouldn’t, like traces of someone’s private information.
+That’s great for accuracy — but sometimes the model *remembers too much*, even bits of someone’s private information.
 
-That’s where **DP-SGD** comes in.  
-It takes the same learning process and adds a little privacy magic.
-
-Here’s how I like to think of it:
-
-1. **Clip the gradients.**  
-   Each data point’s “voice” in training is limited — no one example gets to shout too loud.
-
-2. **Add some noise.**  
-   After clipping, we sprinkle in a bit of random Gaussian noise.  
-   This noise makes sure that even if someone peeked inside the model, they couldn’t tell whose data shaped it.
-
-3. **Track the privacy budget.**  
-   As training goes on, we keep an eye on how much privacy has been “spent.”  
-   When that budget runs out, we stop — just like setting a safety limit.
-
-So to me, DP-SGD is a way of teaching models to **learn from the crowd, not from individuals**.  
-It keeps the essence of the data, but forgets who said what — which feels like a much more human way to learn.
+That’s where **DP-SGD** (Differentially Private Stochastic Gradient Descent) steps in.  
+It takes the same learning process and adds a bit of mathematical “privacy dust.”
 
 ---
 
-## Anatomy of a Noisy Gradient
+### The Math Behind the Privacy
+
+Under the hood, DP-SGD relies on the formal definition of **differential privacy**.  
+A randomized mechanism \( \mathcal{M} : \mathcal{D} \to \mathcal{R} \) is said to satisfy  
+\( (\varepsilon, \delta) \)-differential privacy if, for any two adjacent datasets \( d, d' \in \mathcal{D} \) and any subset of outputs \( S \subseteq \mathcal{R} \),
+
+\[
+\Pr[\mathcal{M}(d) \in S] \le e^{\varepsilon} \Pr[\mathcal{M}(d') \in S] + \delta
+\]
+
+This means that whether or not your data is included, the algorithm’s behavior doesn’t change much —  
+no single individual can drastically affect the outcome.
+
+---
+
+### The Gaussian Mechanism
+
+To achieve this, DP uses noise drawn from a Gaussian distribution:
+
+\[
+\mathcal{M}(d) \triangleq f(d) + \mathcal{N}(0, S_f^2 \cdot \sigma^2)
+\]
 
 
+where  
+- \( S_f \) is the **sensitivity** (the largest possible change in \( f \) when one data point changes), and  
+- \( \sigma \) controls the noise scale — larger \( \sigma \) means stronger privacy.  
 
-**Note:** 
+DP-SGD effectively applies this mechanism at every training step, ensuring that each gradient update respects the same privacy guarantee.
 
-{% highlight javascript %}
-var x = 25;
-function(x) {
-return x \* x;
-}
+---
+
+So to me, DP-SGD is a way of teaching models to **learn from the crowd, not from individuals**. It keeps the essence of the data, but forgets who said what — which feels like a much more human way to learn.
+
+
+---
+
+## Algorithm: Making SGD Private
+
+Algorithm 1 outlines our basic method for training a model with parameters \(\theta\) by minimizing the empirical loss function \(\mathcal{L}(\theta)\).  
+At each step of SGD, we compute the gradient \(\nabla_\theta \mathcal{L}(\theta, x_i)\) for a random subset of examples, clip the ℓ₂ norm of each gradient, compute the average, add Gaussian noise to protect privacy, and take a step in the opposite direction of this average noisy gradient.  
+At the end of training, we output the final model \(\theta_T\) and compute the overall privacy cost \((\varepsilon, \delta)\) using a privacy accountant.
+
+---
+
+### **Algorithm 1: Differentially Private SGD (Outline)**
+
+**Input:**  
+Examples \(\{x_1, \dots, x_N\}\), loss function  
+\[
+\mathcal{L}(\theta) = \frac{1}{N} \sum_i \mathcal{L}(\theta, x_i)
+\]  
+Parameters: learning rate \(\eta_t\), noise scale \(\sigma\), group size \(L\), gradient norm bound \(C\).  
+
+**Initialize** \(\theta_0\) randomly  
+
+**for** \(t \in [T]\) **do**  
+&nbsp;&nbsp;&nbsp;&nbsp;Take a random sample \(L_t\) with sampling probability \(L/N\)  
+&nbsp;&nbsp;&nbsp;&nbsp;**Compute gradient:**  
+\[
+g_t(x_i) \leftarrow \nabla_\theta \mathcal{L}(\theta_t, x_i)
+\]  
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Clip gradient:**  
+\[
+\bar{g}_t(x_i) \leftarrow g_t(x_i) / \max\Big(1, \frac{||g_t(x_i)||_2}{C}\Big)
+\]  
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Add noise:**  
+\[
+\tilde{g}_t \leftarrow \frac{1}{L} \Big(\sum_i \bar{g}_t(x_i) + \mathcal{N}(0, \sigma^2 C^2 \mathbf{I})\Big)
+\]  
+
+&nbsp;&nbsp;&nbsp;&nbsp;**Descent:**  
+\[
+\theta_{t+1} \leftarrow \theta_t - \eta_t \tilde{g}_t
+\]  
+
+**Output:** \(\theta_T\) and compute the overall privacy cost \((\varepsilon, \delta)\) using a privacy accounting method.
+
+---
+
+### The Moments Accountant: Keeping Track of Privacy
+
+The **Moments Accountant** keeps a tight bound on how much privacy loss has accumulated during training.  
+It’s based on the idea that every noisy gradient update “spends” a small privacy cost —  
+and this accountant tracks those costs precisely over all steps.
+
+The accountant defines a *privacy loss random variable* that compares how likely a given output is when training on two adjacent datasets (differing by one person’s data):
+
+\[
+c(o; \mathcal{M}, d, d') = \log \frac{\Pr[\mathcal{M}(d) = o]}{\Pr[\mathcal{M}(d') = o]}
+\]
+
+This measures how much the inclusion or exclusion of one example can influence the output.  
+We then compute the **log moments** of this variable:
+
+\[
+\alpha_{\mathcal{M}}(\lambda; d, d') = \log \mathbb{E}_{o \sim \mathcal{M}(d)} [\exp(\lambda c(o; \mathcal{M}, d, d'))]
+\]
+
+and take the maximum over all possible pairs of neighboring datasets.  
+These moments can then be converted into an overall privacy guarantee \((\varepsilon, \delta)\).
+
+In short, the Moments Accountant works like a **ledger** — it records exactly how much privacy has been spent,  
+ensuring that the final model doesn’t exceed the allowed budget.
+
+---
+
+### Hyperparameter Tuning: Balancing Privacy and Accuracy
+
+In deep learning, tuning **hyperparameters** like batch size, noise level, and learning rate can dramatically affect both accuracy and privacy.  
+Through experiments, the paper finds that model accuracy is more sensitive to these parameters than to network architecture itself.
+
+When we try multiple hyperparameter configurations, each run technically adds to the total privacy cost.  
+However, using results from theory (e.g., Gupta et al.), we can control this accumulation and reuse information across runs more efficiently.  
+
+Empirically, the best settings tend to be:
+- Small to moderate **batch sizes** — too large a batch increases privacy loss.  
+- A relatively **large learning rate** at the beginning, which decays over time.  
+- Carefully chosen **noise scale** \(\sigma\) to balance accuracy and privacy.
+
+---
+
+### That’s What I Think
+
+To me, this section is where the algorithm becomes “human.”  
+DP-SGD isn’t just about math or bounds — it’s about *teaching a model to learn responsibly*.  
+The gradient clipping feels like setting social boundaries, and the Gaussian noise is like gentle confusion that protects everyone’s secrets.  
+
+The Moments Accountant then plays the role of a careful observer, making sure the learning process never crosses the line of privacy.  
+And hyperparameter tuning is where art meets science — finding that sweet spot  
+where the model learns *just enough* without remembering too much.
+
+Here is the lightweight implementation of the code.
+
+---
+
+## Implementing DP-SGD: Where Theory Meets TensorFlow
+
+We have implemented the differentially private SGD algorithms in Tensor Flow. The source code is available under an Apache 2.0 license from github.com/tensorflow/models.
+In practice, it works like this:
+- **Sanitizer** trims each sample’s gradient so no single datapoint can shout too loudly.  
+- **Accountant** keeps track of the privacy “budget” — how much (ε, δ) you’ve spent so far.  
+- **Optimizer** updates the model using a noisy, clipped gradient — learning from the crowd, not from individuals.
+
+---
+
+<details>
+  <summary><strong> Click to view full DP-SGD code (Python-like)</strong></summary>
+
+{% highlight python linenos %}
+# --- DP-SGD Optimizer, Sanitizer, and Accountant -----------------------------
+
+class PrivacyAccountant:
+    """Toy moments accountant for demonstration."""
+    def __init__(self, eps_budget=8.0, delta=1e-5):
+        self.eps_budget = eps_budget
+        self.delta = delta
+        self._eps_spent = 0.0
+
+    def accumulate_privacy_spending(self, batch_size, noise_sigma, sampling_prob):
+        step_eps = sampling_prob / max(noise_sigma, 1e-6)
+        self._eps_spent += step_eps
+
+    def get_spent_privacy(self):
+        return self._eps_spent, self.delta
+
+    def within_limit(self):
+        return self._eps_spent < self.eps_budget
+
+
+class Sanitizer:
+    """Clips per-example gradients and adds Gaussian noise."""
+    def __init__(self, clipping_C, noise_sigma):
+        self.C = float(clipping_C)
+        self.sigma = float(noise_sigma)
+
+    def _l2_norm(self, g):
+        return (sum(x * x for x in g) ** 0.5)
+
+    def clip_per_example(self, per_example_grads):
+        clipped = []
+        for g in per_example_grads:
+            norm = self._l2_norm(g)
+            scale = min(1.0, self.C / max(norm, 1e-12))
+            clipped.append([scale * x for x in g])
+        return clipped
+
+    def add_noise_to_batch_mean(self, clipped_grads):
+        L = len(clipped_grads)
+        d = len(clipped_grads[0])
+        mean_grad = [sum(g[k] for g in clipped_grads) / L for k in range(d)]
+        import random
+        noisy = [m + (self.sigma * self.C) * random.gauss(0.0, 1.0) for m in mean_grad]
+        return noisy
+
+
+class DPSGDOptimizer:
+    """Integrates Sanitizer and Accountant into a training step."""
+    def __init__(self, accountant: PrivacyAccountant, sanitizer: Sanitizer, lr=0.05):
+        self.accountant = accountant
+        self.sanitizer = sanitizer
+        self.lr = lr
+
+    def per_example_gradients(self, loss_fn, params, batch):
+        grads = []
+        eps = 1e-4
+        for x in batch:
+            base = loss_fn(params, x)
+            g = [0.0 for _ in params]
+            for j in range(len(params)):
+                p = params[:]
+                p[j] += eps
+                g[j] = (loss_fn(p, x) - base) / eps
+            grads.append(g)
+        return grads
+
+    def step(self, loss_fn, params, batch, sampling_prob):
+        per_ex_grads = self.per_example_gradients(loss_fn, params, batch)
+        clipped = self.sanitizer.clip_per_example(per_ex_grads)
+        noisy_grad = self.sanitizer.add_noise_to_batch_mean(clipped)
+        self.accountant.accumulate_privacy_spending(
+            batch_size=len(batch),
+            noise_sigma=self.sanitizer.sigma,
+            sampling_prob=sampling_prob,
+        )
+        return [p - self.lr * g for p, g in zip(params, noisy_grad)]
+
+
+# ------------------------------- Training Loop -------------------------------
+
+def dp_train(dataset, init_params, loss_fn, *,
+             lr=0.05, clipping_C=1.0, noise_sigma=1.0,
+             batch_size=64, epochs=5, delta=1e-5, eps_budget=8.0):
+    N = len(dataset)
+    sampling_prob = batch_size / N
+    accountant = PrivacyAccountant(eps_budget=eps_budget, delta=delta)
+    sanitizer = Sanitizer(clipping_C=clipping_C, noise_sigma=noise_sigma)
+    opt = DPSGDOptimizer(accountant, sanitizer, lr=lr)
+
+    import random
+    params = init_params[:]
+
+    for epoch in range(epochs):
+        random.shuffle(dataset)
+        for i in range(0, N, batch_size):
+            if not accountant.within_limit():
+                break
+            batch = dataset[i:i + batch_size]
+            params = opt.step(loss_fn, params, batch, sampling_prob)
+
+        eps, delt = accountant.get_spent_privacy()
+        print(f"[epoch {epoch+1}] θ={params}  |  privacy spent ε≈{eps:.3f}, δ={delt}")
+
+        if not accountant.within_limit():
+            print("Stopping early: privacy budget exhausted.")
+            break
+
+    return params, accountant.get_spent_privacy()
 {% endhighlight %}
 
-You can also write standard Markdown code blocks in triple ticks with a language tag, for instance:
-
-```python
-def foo(x):
-  return x
-```
+</details>
 
 ---
 
-## Anatomy of a Noisy Gradient
-
-You can add interative plots using plotly + iframes :framed_picture:
-
-<div class="l-page">
-  <iframe src="{{ '/assets/plotly/demo.html' | relative_url }}" frameborder='0' scrolling='no' height="500px" width="100%" style="border: 1px dashed grey;"></iframe>
-</div>
-
-The plot must be generated separately and saved into an HTML file.
-To generate the plot that you see above, you can use the following code snippet:
-
-{% highlight python %}
-import pandas as pd
-import plotly.express as px
-df = pd.read_csv(
-'https://raw.githubusercontent.com/plotly/datasets/master/earthquakes-23k.csv'
-)
-fig = px.density_mapbox(
-df,
-lat='Latitude',
-lon='Longitude',
-z='Magnitude',
-radius=10,
-center=dict(lat=0, lon=180),
-zoom=0,
-mapbox_style="stamen-terrain",
-)
-fig.show()
-fig.write_html('assets/plotly/demo.html')
-{% endhighlight %}
+> Algorithm 1 becomes a working loop — each step clips, adds noise, and updates the model, while a privacy accountant keeps score of (ε, δ).  
+> When the budget runs out, training stops — your model learns *from the crowd, not the individuals*.
 
 ---
 
-## Privacy vs. Accuracy — the Eternal Trade-off
+## Does Privacy Hurt Accuracy?(Results)
 
+After building our differentially private SGD system, it’s time to see **how well it actually works**.  
+The experiments follow the original paper setup — evaluating **the moments accountant**, and testing on **MNIST** and **CIFAR-10**.
 
 ---
 
-## When Math Meets Reality
+#### Applying the Moments Accountant
 
-This theme supports creating diagrams directly in markdown using [Mermaid](https://mermaid.js.org/). Mermaid enables users to render flowcharts, sequence diagrams, class diagrams, Gantt charts, and more. Simply embed the diagram syntax within a mermaid code block.
+The **moments accountant** gives us a much **tighter privacy bound** than the old “strong composition theorem”.  
+Instead of overspending the privacy budget too quickly, it keeps the noise–privacy tradeoff well balanced.
 
-To create a Gantt chart, you can use the following syntax:
+Here’s the key idea:
 
-````markdown
-```mermaid
-gantt
-    dateFormat  YYYY-MM-DD
-    title A Gantt Diagram
+> The overall privacy loss \((\varepsilon, \delta)\) depends on  
+> the sampling rate \(q = L/N\), the number of steps \(T = E/q\),  
+> and the noise scale \(\sigma\).
 
-    section Section
-    Task A           :a1, 2025-01-01, 30d
-    Task B           :after a1, 20d
-    Task C           :2025-01-10, 12d
-```
-````
+When using the same training settings (q = 0.01, σ = 4, δ = 10⁻⁵),  
+we can compare the two accounting methods directly.
 
-And here’s how it will be rendered:
+<figure>
+  <img src="/assets/img/moments_vs_composition.png" alt="Privacy accountant vs strong composition" width="480">
+  <figcaption><strong>Figure 2.</strong> The ε-value as a function of training epochs, comparing the strong composition theorem and the moments accountant. The latter achieves much tighter bounds.</figcaption>
+</figure>
 
-```mermaid
-gantt
-    dateFormat  YYYY-MM-DD
-    title A Gantt Diagram
+Using the moments accountant, we achieve roughly  
+**(2.55, 1e−5)-differential privacy**,  
+while the old method only achieves around **(24.22, 1e−5)** —  
+a dramatic improvement in privacy without hurting training.
 
-    section Section
-    Task A           :a1, 2025-01-01, 30d
-    Task B           :after a1, 20d
-    Task C           :2025-01-10, 12d
-```
+---
 
-Similarly, you can also use it to create beautiful class diagrams:
+#### MNIST — Privacy Still Learns
 
-````
-```mermaid
-classDiagram
-direction LR
-    class Animal {
-        +String species
-        +int age
-        +makeSound()
-    }
-    class Dog {
-        +String breed
-        +bark()
-    }
-    class Cat {
-        +String color
-        +meow()
-    }
-    class Bird {
-        +String wingSpan
-        +fly()
-    }
-    class Owner {
-        +String name
-        +int age
-        +adoptAnimal(Animal animal)
-    }
+We start with the classic **MNIST digit classification** task:  
+60,000 training samples and 10,000 test samples of 28×28 grayscale images.
 
-    Animal <|-- Dog
-    Animal <|-- Cat
-    Animal <|-- Bird
-    Owner "1" --> "0..*" Animal
+We use:
+- a **60-dimensional PCA projection**,  
+- a **single hidden layer with 1,000 ReLU units**,  
+- and a **lot size of 600**.
 
-    Dog : +fetch()
-    Cat : +purr()
-    Bird : +sing()
-```
-````
+The model reaches about **98.3% accuracy** after 100 epochs —  
+almost the same as the non-private baseline (98.5%),  
+showing that DP-SGD learns *almost as well as regular SGD* when the noise is tuned properly.
 
-It will be presented as:
+We tested three noise scales:
+- **Small noise** (σ = 2, δ = 1e−5) → ε ≈ 8  
+- **Medium noise** (σ = 4, δ = 1e−5) → ε ≈ 4  
+- **Large noise** (σ = 8, δ = 1e−5) → ε ≈ 2
 
-```mermaid
-classDiagram
-direction LR
-    class Animal {
-        +String species
-        +int age
-        +makeSound()
-    }
-    class Dog {
-        +String breed
-        +bark()
-    }
-    class Cat {
-        +String color
-        +meow()
-    }
-    class Bird {
-        +String wingSpan
-        +fly()
-    }
-    class Owner {
-        +String name
-        +int age
-        +adoptAnimal(Animal animal)
-    }
+And the results are surprisingly stable — around **90–97% accuracy** depending on σ.  
+That’s a great privacy–accuracy tradeoff.
 
-    Animal <|-- Dog
-    Animal <|-- Cat
-    Animal <|-- Bird
-    Owner "1" --> "0..*" Animal
+---
 
-    Dog : +fetch()
-    Cat : +purr()
-    Bird : +sing()
-```
+> *Fun takeaway:*  
+> Differential privacy doesn’t mean “worse learning”.  
+> It just means “learning quietly” — your model still finds patterns,  
+> but it forgets who the individual datapoints were.
 
-With Mermaid, you can easily add clear and dynamic diagrams to enhance your blog content.
+---
+
+### What This Tells Us
+
+DP-SGD with a moments accountant proves that **privacy-preserving deep learning is feasible**.  
+You can train neural networks that remember trends, not people — and do it with quantifiable (ε, δ) guarantees.
+
+In short:
+- The **moments accountant** reduces overestimation of ε.  
+- **MNIST** accuracy stays high (~98%).  
+- **Training stability** improves as ε shrinks smoothly.
+
+It’s a beautiful example of math meeting engineering — and both protecting privacy *and* achieving state-of-the-art accuracy.
+
 
 ---
 
