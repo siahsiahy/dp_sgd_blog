@@ -204,7 +204,6 @@ keep_files:
 
 # Plug-ins
 plugins:
-  - jekyll-include-cache
   - jekyll-archives-v2
   - jekyll-email-protect
   - jekyll-feed
