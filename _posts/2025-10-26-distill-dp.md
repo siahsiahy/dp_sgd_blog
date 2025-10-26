@@ -80,7 +80,7 @@ Just like how attention helps models focus on **important regions** in an image,
 differential privacy helps models **forget unnecessary details** about individual samples.  
 Take the two brains in Fig. 1 as an example.
 
-![DP-SGD Brain](/dp_sgd_blog/assets/img/dpsgd_brain.png)
+![DP-SGD Brain](/assets/img/dpsgd_brain.png)
 
 **Figure 1:** A visual comparison between **SGD** and **DP-SGD**.  
 The brain on the left (SGD) memorizes every tiny detail — faces, words, and data points — 
@@ -448,7 +448,7 @@ a dramatic improvement in privacy without hurting training.
 We trained models on MNIST using different noise levels while keeping other hyperparameters fixed. Below are training and testing accuracy plots for three noise scales:
 
 <figure>
-  <img src="/dp_sgd_blog/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="480">
+  <img src="/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="480">
   <figcaption><strong>Figure 3.</strong> Accuracy over epochs for different noise levels on MNIST (Large, Medium, Small). Each model uses 60D PCA, 1000 hidden units, and clip threshold 4.</figcaption>
 </figure>
 
@@ -465,7 +465,7 @@ Key takeaways:
 To analyze how privacy parameters directly affect accuracy, we varied ε (epsilon) while fixing δ (delta). Each line in the plot below represents a different (ε, δ) pair:
 
 <figure>
-  <img src="/dp_sgd_blog/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
+  <img src="/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
   <figcaption><strong>Figure 4.</strong> Accuracy vs epsilon on MNIST for various delta values.</figcaption>
 </figure>
 
@@ -482,7 +482,7 @@ What’s happening here:
 To see how robust the model is, we varied each parameter individually — like projection dimension, hidden units, lot size, etc. This gives a sense of which knobs matter most.
 
 <figure>
-  <img src="/dp_sgd_blog/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="480">
+  <img src="/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="480">
   <figcaption><strong>Figure 5.</strong> MNIST accuracy when one parameter varies and others stay at reference values.</figcaption>
 </figure>
 
