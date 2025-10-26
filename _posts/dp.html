@@ -1,0 +1,36 @@
+---
+layout: post
+title: "Teaching AI to Whisper, Not Shout"
+date: 2025-10-26
+tags: [Differential Privacy, DP-SGD, Deep Learning]
+math: true
+toc: true
+---
+<p><strong>Subtitle:</strong> How Privacy-Preserving Learning Works Behind the Scenes</p>
+
+<p>Imagine training an AI model on millions of personal medical records.  
+We want the model to learn general patterns — not memorize individuals.  
+That’s exactly what <em>Deep Learning with Differential Privacy</em> achieves.</p>
+
+<h2>1. The Problem: When AI Remembers Too Much</h2>
+<p>Traditional models can accidentally “leak” private data.  
+For example, a language model might memorize a phone number or name  
+from its training set. That’s where differential privacy comes in.</p>
+
+<h2>2. How DP-SGD Works</h2>
+<p>DP-SGD makes small but critical changes to the training process:</p>
+<ul>
+  <li><strong>Gradient clipping:</strong> Limits how much influence any single example can have.</li>
+  <li><strong>Noise addition:</strong> Adds Gaussian noise to gradients to hide individuals’ effects.</li>
+  <li><strong>Privacy accounting:</strong> Tracks the total privacy budget (ε, δ) over iterations.</li>
+</ul>
+
+<h2>3. The Impact</h2>
+<p>This 2016 work by Abadi et al. showed that deep models could be trained privately 
+without losing much accuracy — a milestone for modern AI ethics and security.</p>
+
+<h2>4. Takeaway</h2>
+<p>In short, <em>teaching AI to whisper</em> means giving it just enough voice 
+to learn patterns, but not enough to reveal secrets.</p>
+
+<p><small>Paper: <a href="https://arxiv.org/abs/1607.00133" target="_blank">Deep Learning with Differential Privacy</a></small></p>
