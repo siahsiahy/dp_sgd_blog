@@ -80,7 +80,7 @@ Just like how attention helps models focus on **important regions** in an image,
 differential privacy helps models **forget unnecessary details** about individual samples.  
 Take the two brains in Fig. 1 as an example.
 
-![Illustration of DP-SGD vs SGD](assets/img/dpsgd_brain.png)
+![DP-SGD Brain](/dp_sgd_blog/assets/img/dpsgd_brain.png)
 
 **Figure 1:** A visual comparison between **SGD** and **DP-SGD**.  
 The brain on the left (SGD) memorizes every tiny detail — faces, words, and data points — 
@@ -447,7 +447,11 @@ a dramatic improvement in privacy without hurting training.
 
 We trained models on MNIST using different noise levels while keeping other hyperparameters fixed. Below are training and testing accuracy plots for three noise scales:
 
-{{< figure src="assets/img/result1.jpg" title="Figure 3: Accuracy over epochs for different noise levels on MNIST (Large, Medium, Small). Each model uses 60D PCA, 1000 hidden units, and clip threshold 4." >}}
+<figure>
+  <img src="/dp_sgd_blog/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="480">
+  <figcaption><strong>Figure 3.</strong> Accuracy over epochs for different noise levels on MNIST (Large, Medium, Small). Each model uses 60D PCA, 1000 hidden units, and clip threshold 4.</figcaption>
+</figure>
+
 
 Key takeaways:
 - **Small noise** gives the best accuracy — almost non-private level!
@@ -460,7 +464,11 @@ Key takeaways:
 
 To analyze how privacy parameters directly affect accuracy, we varied ε (epsilon) while fixing δ (delta). Each line in the plot below represents a different (ε, δ) pair:
 
-{{< figure src="assets/img/result2.jpg" title="Figure 4: Accuracy vs epsilon on MNIST for various delta values." >}}
+<figure>
+  <img src="/dp_sgd_blog/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
+  <figcaption><strong>Figure 4.</strong> Accuracy vs epsilon on MNIST for various delta values.</figcaption>
+</figure>
+
 
 What’s happening here:
 - Smaller epsilon = stronger privacy = slightly lower accuracy.
@@ -473,7 +481,11 @@ What’s happening here:
 
 To see how robust the model is, we varied each parameter individually — like projection dimension, hidden units, lot size, etc. This gives a sense of which knobs matter most.
 
-{{< figure src="assets/img/result3.jpg" title="Figure 5: MNIST accuracy when one parameter varies and others stay at reference values." >}}
+<figure>
+  <img src="/dp_sgd_blog/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="480">
+  <figcaption><strong>Figure 5.</strong> MNIST accuracy when one parameter varies and others stay at reference values.</figcaption>
+</figure>
+
 
 - **Projection Dimension**: Accuracy is best around 60 dimensions (PCA). Too low or no PCA hurts generalization.
 - **Hidden Units**: More units help until about 1000–1200; after that, gains plateau.
@@ -488,7 +500,10 @@ To see how robust the model is, we varied each parameter individually — like p
 
 MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level (ε = 2, 4, 8). Here's what we get:
 
-{{< figure src="assets/img/result4.jpg" title="Figure 6: CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." >}}
+<figure>
+  <img src="/dp_sgd_blog/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
+  <figcaption><strong>Figure 6.</strong> CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000.</figcaption>
+</figure>
 
 - With increasing ε (weaker privacy), accuracy improves: from **67% → 70% → 73%**.
 - Compared to state-of-the-art non-private models (~86%), we lose performance — but it’s still **remarkably good** for a DP-trained model!
@@ -541,7 +556,7 @@ We trained deep neural networks *with strong privacy guarantees*—and guess wha
 - On **MNIST**, our model hit **97%** accuracy.
 - On **CIFAR-10**, we got **73%**—not bad at all considering we’re adding noise!
 
-All of this while ensuring **(ε = 8, δ = 10⁻⁵)** differential privacy. 🎉
+All of this while ensuring **(ε = 8, δ = 10⁻⁵)** differential privacy.
  We’re using a private version of **stochastic gradient descent (SGD)** that plugs right into **TensorFlow**. So it’s easy to work with and pretty versatile.
 
 ### Keypoint
@@ -549,7 +564,7 @@ A big part of what made this work is something called the Moments Accountant.
 Think of it as a super-smart privacy tracker that knows exactly how much of your privacy budget is being used during training. It’s way more accurate than traditional methods, and it gives us tight control over how noisy we need to be.
 
 > **Privacy doesn’t have to come at the cost of usefulness.**
-> With the right tools (👋 hello, moments accountant) and some clever training tricks, we can get the best of both worlds: solid performance and user privacy.
+> With the right tools and some clever training tricks, we can get the best of both worlds: solid performance and user privacy.
 
 ---
 
