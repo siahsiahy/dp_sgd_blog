@@ -83,6 +83,17 @@ ninja.data = [{
             window.location.href = "/dp_sgd_blog/blog/2025/dp/";
           
         },
+      },{id: "post-teaching-ai-to-whisper-not-shout",
+        
+          title: "Teaching AI to Whisper, Not Shout",
+        
+        description: "How privacy-preserving deep learning (DP-SGD) works in practice.",
+        section: "Posts",
+        handler: () => {
+          
+            window.location.href = "/dp_sgd_blog/blog/2025/distill-dp/";
+          
+        },
       },{id: "post-a-post-with-plotly-js",
         
           title: "a post with plotly.js",
@@ -367,17 +378,6 @@ ninja.data = [{
         handler: () => {
           
             window.location.href = "/dp_sgd_blog/blog/2021/diagrams/";
-          
-        },
-      },{id: "post-a-distill-style-blog-post",
-        
-          title: "a distill-style blog post",
-        
-        description: "an example of a distill-style blog post and main elements",
-        section: "Posts",
-        handler: () => {
-          
-            window.location.href = "/dp_sgd_blog/blog/2021/distill/";
           
         },
       },{id: "post-a-post-with-twitter",
