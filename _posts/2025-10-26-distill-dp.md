@@ -142,12 +142,12 @@ It takes the same learning process and adds a bit of mathematical “privacy dus
 ### The Math Behind the Privacy
 
 Under the hood, DP-SGD relies on the formal definition of **differential privacy**.  
-A randomized mechanism \( \mathcal{M} : \mathcal{D} \to \mathcal{R} \) is said to satisfy  
-\( (\varepsilon, \delta) \)-differential privacy if, for any two adjacent datasets \( d, d' \in \mathcal{D} \) and any subset of outputs \( S \subseteq \mathcal{R} \),
+A randomized mechanism $ \mathcal{M} : \mathcal{D} \to \mathcal{R} $ is said to satisfy  
+$ (\varepsilon, \delta) $-differential privacy if, for any two adjacent datasets $ d, d' \in \mathcal{D} $ and any subset of outputs $ S \subseteq \mathcal{R} $,
 
-\[
+$$
 \Pr[\mathcal{M}(d) \in S] \le e^{\varepsilon} \Pr[\mathcal{M}(d') \in S] + \delta
-\]
+$$
 
 This means that whether or not your data is included, the algorithm’s behavior doesn’t change much —  
 no single individual can drastically affect the outcome.
@@ -158,9 +158,9 @@ no single individual can drastically affect the outcome.
 
 To achieve this, DP uses noise drawn from a Gaussian distribution:
 
-\[
+$$
 \mathcal{M}(d) \triangleq f(d) + \mathcal{N}(0, S_f^2 \cdot \sigma^2)
-\]
+$$
 
 
 where  
@@ -178,46 +178,46 @@ So to me, DP-SGD is a way of teaching models to **learn from the crowd, not from
 
 ## Algorithm: Making SGD Private
 
-Algorithm 1 outlines our basic method for training a model with parameters \(\theta\) by minimizing the empirical loss function \(\mathcal{L}(\theta)\).  
-At each step of SGD, we compute the gradient \(\nabla_\theta \mathcal{L}(\theta, x_i)\) for a random subset of examples, clip the ℓ₂ norm of each gradient, compute the average, add Gaussian noise to protect privacy, and take a step in the opposite direction of this average noisy gradient.  
-At the end of training, we output the final model \(\theta_T\) and compute the overall privacy cost \((\varepsilon, \delta)\) using a privacy accountant.
+Algorithm 1 outlines our basic method for training a model with parameters $\theta$ by minimizing the empirical loss function $\mathcal{L}(\theta)$.  
+At each step of SGD, we compute the gradient $\nabla_\theta \mathcal{L}(\theta, x_i)$ for a random subset of examples, clip the ℓ₂ norm of each gradient, compute the average, add Gaussian noise to protect privacy, and take a step in the opposite direction of this average noisy gradient.  
+At the end of training, we output the final model $\theta_T$ and compute the overall privacy cost $(\varepsilon, \delta)$ using a privacy accountant.
 
 ---
 
 ### **Algorithm 1: Differentially Private SGD (Outline)**
 
 **Input:**  
-Examples \(\{x_1, \dots, x_N\}\), loss function  
-\[
+Examples $\{x_1, \dots, x_N\}$, loss function  
+$$
 \mathcal{L}(\theta) = \frac{1}{N} \sum_i \mathcal{L}(\theta, x_i)
-\]  
+$$
 Parameters: learning rate \(\eta_t\), noise scale \(\sigma\), group size \(L\), gradient norm bound \(C\).  
 
-**Initialize** \(\theta_0\) randomly  
+**Initialize** $\theta_0$ randomly  
 
-**for** \(t \in [T]\) **do**  
-&nbsp;&nbsp;&nbsp;&nbsp;Take a random sample \(L_t\) with sampling probability \(L/N\)  
+**for** $t \in [T]$ **do**  
+&nbsp;&nbsp;&nbsp;&nbsp;Take a random sample $\(L_t$ with sampling probability $L/N$  
 &nbsp;&nbsp;&nbsp;&nbsp;**Compute gradient:**  
-\[
+$$
 g_t(x_i) \leftarrow \nabla_\theta \mathcal{L}(\theta_t, x_i)
-\]  
+$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Clip gradient:**  
-\[
+$$
 \bar{g}_t(x_i) \leftarrow g_t(x_i) / \max\Big(1, \frac{||g_t(x_i)||_2}{C}\Big)
-\]  
+$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Add noise:**  
-\[
+$$
 \tilde{g}_t \leftarrow \frac{1}{L} \Big(\sum_i \bar{g}_t(x_i) + \mathcal{N}(0, \sigma^2 C^2 \mathbf{I})\Big)
-\]  
+$$
 
 &nbsp;&nbsp;&nbsp;&nbsp;**Descent:**  
-\[
+$$
 \theta_{t+1} \leftarrow \theta_t - \eta_t \tilde{g}_t
-\]  
+$$
 
-**Output:** \(\theta_T\) and compute the overall privacy cost \((\varepsilon, \delta)\) using a privacy accounting method.
+**Output:** $\theta_T$ and compute the overall privacy cost $(\varepsilon, \delta)$ using a privacy accounting method.
 
 ---
 
@@ -229,10 +229,9 @@ and this accountant tracks those costs precisely over all steps.
 
 The accountant defines a *privacy loss random variable* that compares how likely a given output is when training on two adjacent datasets (differing by one person’s data):
 
-\[
+$$
 c(o; \mathcal{M}, d, d') = \log \frac{\Pr[\mathcal{M}(d) = o]}{\Pr[\mathcal{M}(d') = o]}
-\]
-
+$$
 This measures how much the inclusion or exclusion of one example can influence the output.  
 We then compute the **log moments** of this variable:
 
@@ -424,9 +423,9 @@ Instead of overspending the privacy budget too quickly, it keeps the noise–pri
 
 Here’s the key idea:
 
-> The overall privacy loss \((\varepsilon, \delta)\) depends on  
-> the sampling rate \(q = L/N\), the number of steps \(T = E/q\),  
-> and the noise scale \(\sigma\).
+> The overall privacy loss $(\varepsilon, \delta)$ depends on  
+> the sampling rate $q = L/N$, the number of steps $T = E/q$,  
+> and the noise scale $\sigma$.
 
 When using the same training settings (q = 0.01, σ = 4, δ = 10⁻⁵),  
 we can compare the two accounting methods directly.
