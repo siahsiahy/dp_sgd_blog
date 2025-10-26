@@ -1,10 +1,10 @@
 ---
 layout: distill
-title: a distill-style blog post
-description: an example of a distill-style blog post and main elements
-tags: distill formatting
+title: Teaching AI to Whisper, Not Shout
+description: How privacy-preserving deep learning (DP-SGD) works in practice.
+tags: [Differential Privacy, DP-SGD, Deep Learning]
 giscus_comments: true
-date: 2021-05-22
+date: 2025-10-26
 featured: true
 mermaid:
   enabled: true
@@ -19,20 +19,12 @@ tikzjax: true
 typograms: true
 
 authors:
-  - name: Albert Einstein
-    url: "https://en.wikipedia.org/wiki/Albert_Einstein"
-    affiliations:
-      name: IAS, Princeton
-  - name: Boris Podolsky
-    url: "https://en.wikipedia.org/wiki/Boris_Podolsky"
-    affiliations:
-      name: IAS, Princeton
-  - name: Nathan Rosen
-    url: "https://en.wikipedia.org/wiki/Nathan_Rosen"
-    affiliations:
-      name: IAS, Princeton
+  - name: YAN SHIYU
+    url: "https://siashiay.github.io/"
+affiliations:
+  - name: Yonsei University
+  url: https://www.yonsei.ac.kr/en_sc/
 
-bibliography: 2018-12-22-distill.bib
 
 # Optionally, you can add a table of contents to your post.
 # NOTES:
@@ -46,18 +38,14 @@ toc:
     # subsections:
     #   - name: Example Child Subsection 1
     #   - name: Example Child Subsection 2
-  - name: Citations
-  - name: Footnotes
-  - name: Code Blocks
-  - name: Interactive Plots
-  - name: Mermaid
-  - name: Diff2Html
-  - name: Leaflet
-  - name: Chartjs, Echarts and Vega-Lite
-  - name: TikZ
-  - name: Typograms
-  - name: Layouts
-  - name: Other Typography?
+  - name: Why Whisper?
+  - name: What Does DP-SGD Actually Do?
+  - name: Anatomy of a Noisy Gradient
+  - name: Privacy vs. Accuracy — the Eternal Trade-off
+  - name: When Math Meets Reality
+  - name: Lessons from Experiments
+  - name: Beyond the Noise
+  - name: References
 
 # Below is an example of injecting additional post-specific styles.
 # If you use this post as a template, delete this _styles block.
@@ -78,60 +66,104 @@ _styles: >
   }
 ---
 
-## Equations
+## Motivation
 
-This theme supports rendering beautiful math in inline and display modes using [MathJax 3](https://www.mathjax.org/) engine.
-You just need to surround your math expression with `$$`, like `$$ E = mc^2 $$`.
-If you leave it inside a paragraph, it will produce an inline expression, just like $$ E = mc^2 $$.
+Deep learning showed me how models can learn powerful patterns from massive amounts of data.  
+But data privacy reminded me that these datasets often come from **real people** — each record a small fragment of someone’s life.  
 
-In fact, you can also use a single dollar sign `$` to create inline formulas, such as `$ E = mc^2 $`, which will render as $ E = mc^2 $. This approach provides the same effect during TeX-based compilation, but visually it appears slightly less bold compared to double-dollar signs `$$`, making it blend more naturally with surrounding text.
+That made me wonder:  
+*Can we build models that learn, without exposing the people who taught them?*  
 
-To use display mode, again surround your expression with `$$` and place it as a separate paragraph.
-Here is an example:
-
-$$
-\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
-$$
-
-Note that MathJax 3 is [a major re-write of MathJax](https://docs.mathjax.org/en/latest/upgrading/whats-new-3.0.html) that brought a significant improvement to the loading and rendering speed, which is now [on par with KaTeX](http://www.intmath.com/cg5/katex-mathjax-comparison.php).
+This question led me to explore **DP-SGD (Differentially Private Stochastic Gradient Descent)** —  
+an elegant training method that allows neural networks to **learn responsibly** —  
+keeping the insights, but forgetting the identities.
 
 ---
 
-## Citations
+Just like how attention helps models focus on **important regions** in an image,  
+differential privacy helps models **forget unnecessary details** about individual samples.  
+Take the two brains in Fig. 1 as an example.
 
-Citations are then used in the article body with the `<d-cite>` tag.
-The key attribute is a reference to the id provided in the bibliography.
-The key attribute can take multiple ids, separated by commas.
+![Illustration of DP-SGD vs SGD](assets/img/dpsgd_brain.png)
 
-The citation is presented inline like this: <d-cite key="gregor2015draw"></d-cite> (a number that displays more information on hover).
-If you have an appendix, a bibliography is automatically created and populated in it.
-
-Distill chose a numerical inline citation style to improve readability of citation dense articles and because many of the benefits of longer citations are obviated by displaying more information on hover.
-However, we consider it good style to mention author last names if you discuss something at length and it fits into the flow well — the authors are human and it’s nice for them to have the community associate them with their work.
-
----
-
-## Footnotes
-
-Just wrap the text you would like to show up in a footnote in a `<d-footnote>` tag.
-The number of the footnote will be automatically generated.<d-footnote>This will become a hoverable footnote.</d-footnote>
+**Figure 1:** A visual comparison between **SGD** and **DP-SGD**.  
+The brain on the left (SGD) memorizes every tiny detail — faces, words, and data points — 
+while the brain on the right (DP-SGD) only retains the general patterns after adding noise.  
+This simple idea makes models *learn like humans — remembering what matters, and forgetting what doesn’t.*
 
 ---
 
-## Code Blocks
+## Why Whisper?
+*Why should a neural network learn to whisper instead of shout?*
 
-Syntax highlighting is provided within `<d-code>` tags.
-An example of inline code snippets: `<d-code language="html">let x = 10;</d-code>`.
-For larger blocks of code, add a `block` attribute:
+Modern deep learning thrives on **data — lots of it.**  
+The more data a model sees, the smarter it becomes.  
+But there’s a catch: much of that data is **personal** — medical records, voice recordings, photos, chat logs.  
 
-<d-code block language="javascript">
-  var x = 25;
-  function(x) {
-    return x * x;
-  }
-</d-code>
+> “The more a model learns, the more it remembers — sometimes too much.”
 
-**Note:** `<d-code>` blocks do not look good in the dark mode. You can instead use the standard Jekyll syntax highlight with the `highlight` liquid tag.
+Imagine training a speech recognition system.  
+It might not only learn to recognize words,  
+but also **remember the speaker’s voice** so well  
+that someone could later reconstruct what that person said.  
+That’s not intelligence — that’s a privacy leak.
+
+### The Problem
+Deep neural networks have millions (or even billions) of parameters.  
+These parameters don’t just learn _patterns_ — they can memorize _examples_.  
+Even without malicious intent, attackers can exploit this fact.
+
+Researchers have shown **model inversion attacks**,  
+where adversaries, given access to a model’s outputs,  
+can reconstruct sensitive parts of the training data —  
+like recreating someone’s face from a classifier’s memory.
+
+In short:
+> The bigger and more capable our models become,  
+> the more they risk revealing what they were trained on.
+
+### The Goal
+The main goal of this paper is to train deep learning models  that can **learn from data without revealing anyone’s secrets**.  
+
+The authors introduced **DP-SGD**, a clever twist on the classic SGD algorithm.  
+It adds a bit of random noise during training,  so the model learns general patterns — but forgets the fine details about any individual.  
+
+That is to say, they wanted to prove that **privacy and performance don’t have to be enemies** —  
+you can build smart models and keep people’s data safe at the same time.
+
+---
+
+## What Does DP-SGD Actually Do?
+
+In deep learning, we usually train models with **stochastic gradient descent (SGD)**, letting them adjust their weights based on every tiny detail in the data.  
+That’s great for accuracy, but the model can end up *remembering* things it shouldn’t, like traces of someone’s private information.
+
+That’s where **DP-SGD** comes in.  
+It takes the same learning process and adds a little privacy magic.
+
+Here’s how I like to think of it:
+
+1. **Clip the gradients.**  
+   Each data point’s “voice” in training is limited — no one example gets to shout too loud.
+
+2. **Add some noise.**  
+   After clipping, we sprinkle in a bit of random Gaussian noise.  
+   This noise makes sure that even if someone peeked inside the model, they couldn’t tell whose data shaped it.
+
+3. **Track the privacy budget.**  
+   As training goes on, we keep an eye on how much privacy has been “spent.”  
+   When that budget runs out, we stop — just like setting a safety limit.
+
+So to me, DP-SGD is a way of teaching models to **learn from the crowd, not from individuals**.  
+It keeps the essence of the data, but forgets who said what — which feels like a much more human way to learn.
+
+---
+
+## Anatomy of a Noisy Gradient
+
+
+
+**Note:** 
 
 {% highlight javascript %}
 var x = 25;
@@ -149,7 +181,7 @@ def foo(x):
 
 ---
 
-## Interactive Plots
+## Anatomy of a Noisy Gradient
 
 You can add interative plots using plotly + iframes :framed_picture:
 
@@ -182,17 +214,12 @@ fig.write_html('assets/plotly/demo.html')
 
 ---
 
-## Details boxes
+## Privacy vs. Accuracy — the Eternal Trade-off
 
-Details boxes are collapsible boxes which hide additional information from the user. They can be added with the `details` liquid tag:
-
-{% details Click here to know more %}
-Additional details, where math $$ 2x - 1 $$ and `code` is rendered correctly.
-{% enddetails %}
 
 ---
 
-## Mermaid
+## When Math Meets Reality
 
 This theme supports creating diagrams directly in markdown using [Mermaid](https://mermaid.js.org/). Mermaid enables users to render flowcharts, sequence diagrams, class diagrams, Gantt charts, and more. Simply embed the diagram syntax within a mermaid code block.
 
