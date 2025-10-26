@@ -164,8 +164,8 @@ $$
 
 
 where  
-- \( S_f \) is the **sensitivity** (the largest possible change in \( f \) when one data point changes), and  
-- \( \sigma \) controls the noise scale — larger \( \sigma \) means stronger privacy.  
+- $ S_f $ is the **sensitivity** (the largest possible change in $ f $ when one data point changes), and  
+- $ \sigma $ controls the noise scale — larger $ \sigma $ means stronger privacy.  
 
 DP-SGD effectively applies this mechanism at every training step, ensuring that each gradient update respects the same privacy guarantee.
 
@@ -232,6 +232,7 @@ The accountant defines a *privacy loss random variable* that compares how likely
 $$
 c(o; \mathcal{M}, d, d') = \log \frac{\Pr[\mathcal{M}(d) = o]}{\Pr[\mathcal{M}(d') = o]}
 $$
+
 This measures how much the inclusion or exclusion of one example can influence the output.  
 We then compute the **log moments** of this variable:
 
@@ -258,7 +259,7 @@ However, using results from theory (e.g., Gupta et al.), we can control this acc
 Empirically, the best settings tend to be:
 - Small to moderate **batch sizes** — too large a batch increases privacy loss.  
 - A relatively **large learning rate** at the beginning, which decays over time.  
-- Carefully chosen **noise scale** \(\sigma\) to balance accuracy and privacy.
+- Carefully chosen **noise scale** $\sigma$ to balance accuracy and privacy.
 
 ---
 
@@ -427,7 +428,7 @@ Here’s the key idea:
 > the sampling rate $q = L/N$, the number of steps $T = E/q$,  
 > and the noise scale $\sigma$.
 
-When using the same training settings (q = 0.01, σ = 4, δ = 10⁻⁵),  
+When using the same training settings $(q = 0.01, σ = 4, δ = 10⁻⁵)$  
 we can compare the two accounting methods directly.
 
 <figure>
@@ -504,14 +505,14 @@ To see how robust the model is, we varied each parameter individually — like p
 
 ### CIFAR-10 Results: What About Real Images?
 
-MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level (ε = 2, 4, 8). Here's what we get:
+MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level ($ε$ = 2, 4, 8). Here's what we get:
 
 <figure>
   <img src="/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
   <figcaption><strong>Figure 6.</strong> CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000.</figcaption>
 </figure>
 
-- With increasing ε (weaker privacy), accuracy improves: from **67% → 70% → 73%**.
+- With increasing $ε$ (weaker privacy), accuracy improves: from **67% → 70% → 73%**.
 - Compared to state-of-the-art non-private models (~86%), we lose performance — but it’s still **remarkably good** for a DP-trained model!
 
 ---
@@ -548,7 +549,9 @@ Most DP work tries to solve convex optimization problems—think logistic regres
 Other researchers have also tackled DP learning:
 
 **Netflix Prize (McSherry & Mironov):** The first full-stack DP recommender system using Gaussian noise on sufficient statistics. But their problem had cleaner structure than deep learning.
+
 **Distributed DP (Shokri & Shmatikov):** Each user trains on their own data and sends noisy gradients to a central server. But privacy loss per parameter can easily exceed thousands—yikes.
+
 **Autoencoders (Phan et al.):** Recent work adds DP constraints to the loss functions of autoencoders.
 
 Our approach differs by applying end-to-end DP training using standard neural networks and SGD, without assuming any special structure in the data or model.
@@ -562,7 +565,7 @@ We trained deep neural networks *with strong privacy guarantees*—and guess wha
 - On **MNIST**, our model hit **97%** accuracy.
 - On **CIFAR-10**, we got **73%**—not bad at all considering we’re adding noise!
 
-All of this while ensuring **(ε = 8, δ = 10⁻⁵)** differential privacy.
+All of this while ensuring **$(ε = 8, δ = 10⁻⁵)$** differential privacy.
  We’re using a private version of **stochastic gradient descent (SGD)** that plugs right into **TensorFlow**. So it’s easy to work with and pretty versatile.
 
 ### Keypoint
