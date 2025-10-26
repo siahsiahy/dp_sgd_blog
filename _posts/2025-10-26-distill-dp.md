@@ -33,15 +33,14 @@ affiliations:
 #   - we may want to automate TOC generation in the future using
 #     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
 toc:
-
-  - name: Why Whisper?
-  - name: What Does DP-SGD Actually Do?
-  - name: Algorithm: Making SGD Private
-  - name: Implementing DP-SGD: Where Theory Meets TensorFlow
-  - name: Does Privacy Hurt Accuracy?(Results)
-  - name: Who Else Is Thinking About Privacy?
-  - name: Conclusions
-  - name: References
+  - name: "Why Whisper?"
+  - name: "What Does DP–SGD Actually Do?"
+  - name: "Algorithm: Making SGD Private"
+  - name: "Implementing DP–SGD: Where Theory Meets TensorFlow"
+  - name: "Does Privacy Hurt Accuracy? (Results)"
+  - name: "Who Else Is Thinking About Privacy?"
+  - name: "Conclusions"
+  - name: "References"
 
 # Below is an example of injecting additional post-specific styles.
 # If you use this post as a template, delete this _styles block.
