@@ -579,14 +579,25 @@ Think of it as a super-smart privacy tracker that knows exactly how much of your
 
 ## References
 
-<details>
-<summary>Show References</summary>
+1. Abadi et al., *Deep Learning with Differential Privacy*.  
+   [https://arxiv.org/abs/1607.00133](https://arxiv.org/abs/1607.00133)
 
-1. Abadi et al., *Deep Learning with Differential Privacy* [https://arxiv.org/abs/1607.00133](https://arxiv.org/abs/1607.00133)  
-2. TensorFlow Privacy: [https://github.com/tensorflow/privacy](https://github.com/tensorflow/privacy)  
-3. McSherry, F. & Mironov, I. *Differentially Private Recommender Systems: Building Privacy into the Netflix Prize Contenders.* In *Proceedings of the 15th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD’09)*, pp. 627–636. ACM, 2009.  
-4. Dwork, C. & Roth, A. *The Algorithmic Foundations of Differential Privacy.* *Foundations and Trends in Theoretical Computer Science.* Now Publishers, 2014.  
+2. TensorFlow Privacy:  
+   [https://github.com/tensorflow/privacy](https://github.com/tensorflow/privacy)
 
-</details>
+3. McSherry, F. & Mironov, I. *Differentially Private Recommender Systems: Building Privacy into the Netflix Prize Contenders.*  
+   In *Proceedings of the 15th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD’09)*, pp. 627–636. ACM, 2009.  
+   [https://www.cs.toronto.edu/~madras/presentations/dp-recommender-systems-slides.pdf](https://www.cs.toronto.edu/~madras/presentations/dp-recommender-systems-slides.pdf)
 
+4. Dwork, C. & Roth, A. *The Algorithmic Foundations of Differential Privacy.* *Foundations and Trends in Theoretical Computer Science.* Now Publishers, 2014.  
+   [https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf](https://www.cis.upenn.edu/~aaroth/Papers/privacybook.pdf)
+
+5. Mironov, I. *Rényi Differential Privacy of the Sampled Gaussian Mechanism.*  
+   In *IEEE 30th Computer Security Foundations Symposium (CSF’17)*. IEEE, 2017.  
+   [https://doi.org/10.1109/CSF.2017.11](https://doi.org/10.1109/CSF.2017.11)
+
+6. Desfontaines, D. & Pejó, B. *SoK: Differential Privacies.*  
+   *Proceedings on Privacy Enhancing Technologies (PoPETs)*, vol. 2020, no. 2, pp. 288–313, 2020.  
+   [https://doi.org/10.2478/popets-2020-0020](https://doi.org/10.2478/popets-2020-0020)
+   
 ---
