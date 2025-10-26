@@ -445,6 +445,13 @@ a dramatic improvement in privacy without hurting training.
 
 ### MNIST Results: Small Noise, Big Insights
 
+Before diving into the results, let’s quickly talk about the dataset we’re using — MNIST.
+
+MNIST is like the "Hello World" of machine learning. It’s a collection of 70,000 grayscale images of handwritten digits (0 through 9), each sized 28x28 pixels. It’s super popular for testing image classification models, especially when experimenting with new techniques like Differential Privacy.
+We train a model to classify these digits, and then see how well it performs under different levels of noise — a key ingredient in privacy-preserving training.
+
+![MNIST](/assets/img/MNIST.jpg)
+
 We trained models on MNIST using different noise levels while keeping other hyperparameters fixed. Below are training and testing accuracy plots for three noise scales:
 
 <figure>
@@ -501,7 +508,7 @@ To see how robust the model is, we varied each parameter individually — like p
 MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level (ε = 2, 4, 8). Here's what we get:
 
 <figure>
-  <img src="/dp_sgd_blog/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
+  <img src="/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="480">
   <figcaption><strong>Figure 6.</strong> CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000.</figcaption>
 </figure>
 
