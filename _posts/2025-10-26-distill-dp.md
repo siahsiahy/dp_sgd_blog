@@ -455,7 +455,7 @@ We train a model to classify these digits, and then see how well it performs und
 We trained models on MNIST using different noise levels while keeping other hyperparameters fixed. Below are training and testing accuracy plots for three noise scales:
 
 <figure>
-  <img src="{{ site.baseurl }}/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="600">
+  <img src="{{ site.baseurl }}/assets/img/result1.jpg" alt="Accuracy over epochs for different noise levels on MNIST" width="800">
   <figcaption><strong>Figure 3.</strong> Accuracy over epochs for different noise levels on MNIST (Large, Medium, Small). Each model uses 60D PCA, 1000 hidden units, and clip threshold 4.</figcaption>
 </figure>
 
