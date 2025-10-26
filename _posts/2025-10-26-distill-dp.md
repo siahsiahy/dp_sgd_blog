@@ -472,7 +472,7 @@ Key takeaways:
 To analyze how privacy parameters directly affect accuracy, we varied ε (epsilon) while fixing δ (delta). Each line in the plot below represents a different (ε, δ) pair:
 
 <figure>
-  <img src="{{ site.baseurl }}/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="480">
+  <img src="{{ site.baseurl }}/assets/img/result2.jpg" alt="Accuracy vs epsilon on MNIST for various delta values." width="800">
   <figcaption><strong>Figure 4.</strong> Accuracy vs epsilon on MNIST for various delta values.</figcaption>
 </figure>
 
@@ -489,7 +489,7 @@ What’s happening here:
 To see how robust the model is, we varied each parameter individually — like projection dimension, hidden units, lot size, etc. This gives a sense of which knobs matter most.
 
 <figure>
-  <img src="{{ site.baseurl }}/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="520">
+  <img src="{{ site.baseurl }}/assets/img/result3.jpg" alt="MNIST accuracy when one parameter varies and others stay at reference values." width="800">
   <figcaption><strong>Figure 5.</strong> MNIST accuracy when one parameter varies and others stay at reference values.</figcaption>
 </figure>
 
@@ -508,7 +508,7 @@ To see how robust the model is, we varied each parameter individually — like p
 MNIST is nice, but what about a more complex dataset like CIFAR-10? We use a 2-layer convolutional network and vary the noise level ($ε$ = 2, 4, 8). Here's what we get:
 
 <figure>
-  <img src="{{ site.baseurl }}/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="520">
+  <img src="{{ site.baseurl }}/assets/img/result4.jpg" alt="CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000." width="800">
   <figcaption><strong>Figure 6.</strong> CIFAR-10 accuracy under different noise levels with lot size = 2000 or 4000.</figcaption>
 </figure>
 
