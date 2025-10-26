@@ -236,9 +236,9 @@ c(o; \mathcal{M}, d, d') = \log \frac{\Pr[\mathcal{M}(d) = o]}{\Pr[\mathcal{M}(d
 This measures how much the inclusion or exclusion of one example can influence the output.  
 We then compute the **log moments** of this variable:
 
-\[
+$$
 \alpha_{\mathcal{M}}(\lambda; d, d') = \log \mathbb{E}_{o \sim \mathcal{M}(d)} [\exp(\lambda c(o; \mathcal{M}, d, d'))]
-\]
+$$
 
 and take the maximum over all possible pairs of neighboring datasets.  
 These moments can then be converted into an overall privacy guarantee \((\varepsilon, \delta)\).
