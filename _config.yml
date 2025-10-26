@@ -166,6 +166,7 @@ collections:
 markdown: kramdown
 highlighter: rouge
 kramdown:
+  math_engine: mathjax
   input: GFM
   syntax_highlighter_opts:
     css_class: "highlight"
@@ -174,7 +175,7 @@ kramdown:
     block:
       line_numbers: false
       start_line: 1
-
+use_math: true
 # Includes & excludes
 include: ["_pages", "_scripts"]
 exclude:
@@ -203,6 +204,7 @@ keep_files:
 
 # Plug-ins
 plugins:
+  - jekyll-include-cache
   - jekyll-archives-v2
   - jekyll-email-protect
   - jekyll-feed
