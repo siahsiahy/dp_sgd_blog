@@ -6,7 +6,7 @@ subtitle: <a href='#'>Yonsei University</a> · Computer Science · Researcher in
 
 profile:
   align: right
-  image: prof_pic.jpg
+  image: IMG_9911.jpg
   image_circular: false # crops the image to make it circular
   more_info: >
     <p>Yonsei University</p>
