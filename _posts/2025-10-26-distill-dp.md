@@ -25,6 +25,11 @@ affiliations:
   - name: Yonsei University
     url: https://www.yonsei.ac.kr/en_sc/
 
+scholar:
+  style: apa
+  locale: en
+  source: /_bibliography/
+  bibliography: papers.bib
 
 # Optionally, you can add a table of contents to your post.
 # NOTES:
