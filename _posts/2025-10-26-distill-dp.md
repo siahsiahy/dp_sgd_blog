@@ -80,7 +80,7 @@ Just like how attention helps models focus on **important regions** in an image,
 differential privacy helps models **forget unnecessary details** about individual samples.  
 Take the two brains in Fig. 1 as an example.
 
-![DP-SGD Brain](/assets/img/dpsgd_brain.png)
+![DP-SGD Brain]({{ site.baseurl }}/assets/img/dpsgd_brain.png)
 
 **Figure 1:** A visual comparison between **SGD** and **DP-SGD**.  
 The brain on the left (SGD) memorizes every tiny detail — faces, words, and data points — 
