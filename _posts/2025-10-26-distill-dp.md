@@ -23,7 +23,7 @@ authors:
     url: "https://siashiay.github.io/"
 affiliations:
   - name: Yonsei University
-  url: https://www.yonsei.ac.kr/en_sc/
+    url: https://www.yonsei.ac.kr/en_sc/
 
 
 # Optionally, you can add a table of contents to your post.
