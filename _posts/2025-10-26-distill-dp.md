@@ -1,5 +1,5 @@
 ---
-layout: distill
+layout: post
 title: Teaching AI to Whisper, Not Shout
 description: How privacy-preserving deep learning (DP-SGD) works in practice.
 tags: [Differential Privacy, DP-SGD, Deep Learning]
